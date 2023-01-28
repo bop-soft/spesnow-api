@@ -20,10 +20,12 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('category');
             $table->foreignId('village_id')->constrained()->cascadeOnDelete();
+            $table->double('longitude')->nullable();
+            $table->double('latitude')->nullable();
             $table->string('village');
             $table->string('parish');
             $table->string('subcounty');
-            $table->string('county')->nullable();
+            $table->string('county');
             $table->string('district');
             $table->string('country')->default('Uganda');
             $table->bigInteger('price');

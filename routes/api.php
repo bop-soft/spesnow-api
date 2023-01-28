@@ -40,6 +40,7 @@ Route::group(['prefix' => 'v1',], function(){
     });
     // ------------ rentals -----------------
     Route::controller(RentalController::class)->group(function(){
+        Route::get('rentals/nearest', 'nearestRentals')->name('rentals.nearest');
         Route::get('rentals', 'index')->name('rentals.index');
         Route::get('rentals/latest', 'latestRentals')->name('rentals.latest');
         Route::get('categories/{id}/rentals', 'categoryRentals')->name('categories.rentals');
@@ -56,6 +57,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function(){
         Route::get('users', 'index')->name('users.index');
         Route::get('users/{user}', 'show')->name('users.show');
         Route::delete('users/{user}', 'destroy')->name('users.destroy');
+        Route::get('users/subscription/check', 'subscriptionCheck')->name('subscription.check');
 });
     // ------------ adverts -----------------
     Route::apiResource('adverts', AdvertController::class);

@@ -24,6 +24,16 @@ class UserController extends BaseController
         return $this->sendResponse($resource, 'All users have been fetched');
     }
 
+    public function subscriptionCheck() {
+        $subscribed = auth()->user()->subscribed;
+        $subscribed = User::find(1)->subscribed;
+        if ($subscribed) {
+            $resource = true;
+            return $this->sendResponse($resource, 'User has an active subscription');
+        }
+        return $this->sendError('User has no active subscription', 401);
+    }
+
     public function authCheck() {
         if (auth()->check()) {
             $resource = true;

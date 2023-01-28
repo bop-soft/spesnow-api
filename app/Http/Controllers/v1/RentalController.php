@@ -8,6 +8,8 @@ use App\Http\Requests\v1\RentalUpdateRequest;
 use App\Http\Resources\v1\RentalResource;
 use App\Models\Rental;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\Request;
+
 
 class RentalController extends BaseController
 {
@@ -18,30 +20,56 @@ class RentalController extends BaseController
 
         $rentals = Rental::query()->when(request('search'), function ($query) {
             $query->where('title', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('category', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('village', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
-            // ->orWhere('county', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('district', 'LIKE', '%' . request('search') . '%')
-            ->orWhere('country', 'LIKE', '%' . request('search') . '%');
-        })->with('user')->orderby('promoted','desc')->get();
+                ->orWhere('category', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('village', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('county', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('district', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('country', 'LIKE', '%' . request('search') . '%');
+        })->with('user')->orderby('promoted', 'desc')->get();
 
         $resource = RentalResource::collection($rentals);
 
         return $this->sendResponse($resource, 'All rentals have been fetched');
     }
 
-    public function categoryRentals($id) {
+    public function nearestRentals()
+    {
+        $userLat = request('lat');
+        $userLong = request('long');
+        $distance = 50;
 
-        $rentals = Rental::where('category_id', $id)->orderby('promoted','desc')->get();
+        /* Haversine formula is a mathematical formula used to calculate the distance between two points 
+        on a sphere, such as the Earth.
+        */
+        $rentals = Rental::selectRaw("*, (6371 * acos(cos(radians(?)) 
+                * cos(radians(latitude)) 
+                * cos(radians(longitude) - radians(?)) 
+                + sin(radians(?)) 
+                * sin(radians(latitude)))) AS distance", [$userLat, $userLong, $userLat])
+            ->having("distance", "<", $distance)
+            ->orderBy("distance")
+            ->take(20)
+            ->get();
+
+        $resource = RentalResource::collection($rentals);
+
+        return $this->sendResponse($resource, 'All rentals within 50km have been fetched');
+    }
+
+    public function categoryRentals($id)
+    {
+
+        $rentals = Rental::where('category_id', $id)->orderby('promoted', 'desc')->get();
 
         $resource = RentalResource::collection($rentals);
 
         return $this->sendResponse($resource, 'All rentals have been fetched');
     }
 
-    public function latestRentals() {
+    public function latestRentals()
+    {
 
         $rentals = Rental::latest('updated_at')->paginate(20);
 
@@ -97,7 +125,7 @@ class RentalController extends BaseController
         // http://127.0.0.1:8000/api/v1/query?sort=+price&filter[district]=busia
 
         $rentals = QueryBuilder::for(Rental::class)
-            ->allowedFilters(['category','village','parish','subcounty','municipality','district','country'])
+            ->allowedFilters(['category', 'village', 'parish', 'subcounty', 'county', 'district', 'country'])
             ->allowedSorts('price')
             ->paginate();
 

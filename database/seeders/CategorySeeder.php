@@ -16,23 +16,23 @@ class CategorySeeder extends Seeder
     public function run()
     {
         Category::create([
-            'name' => 'apartment',
+            'name' => 'Apartment',
             'image_url' => fake()->imageUrl, 
         ]);
         Category::create([
-            'name' => 'muzigo',
+            'name' => 'Muzigo',
             'image_url' => fake()->imageUrl, 
         ]);
         Category::create([
-            'name' => 'single unit',
+            'name' => 'Single Unit',
             'image_url' => fake()->imageUrl, 
         ]);
         Category::create([
-            'name' => 'shop',
+            'name' => 'Shop',
             'image_url' => fake()->imageUrl, 
         ]);
         Category::create([
-            'name' => 'warehouse',
+            'name' => 'Warehouse',
             'image_url' => fake()->imageUrl, 
         ]);
     }
