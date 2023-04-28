@@ -23,7 +23,7 @@ return new class extends Migration
             $table->double('longitude')->nullable();
             $table->double('latitude')->nullable();
             $table->string('village');
-            $table->string('parish');
+            $table->string('parish');   
             $table->string('subcounty');
             $table->string('county');
             $table->string('district');

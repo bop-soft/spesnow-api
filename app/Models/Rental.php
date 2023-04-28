@@ -39,35 +39,43 @@ class Rental extends Model
         'uganda',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function village() {
-        return $this->belongsTo(Village::class,'village_id');
+    public function village()
+    {
+        return $this->belongsTo(Village::class, 'village_id');
     }
 
-    public function images() {
+    public function images()
+    {
         return $this->hasMany(Image::class);
     }
 
-    public function amenities() {
+    public function amenities()
+    {
         return $this->hasMany(Amenity::class);
     }
 
-    public function ratings() {
+    public function ratings()
+    {
         return $this->hasMany(Rating::class);
     }
 
-    public function favorites() {
+    public function favorites()
+    {
         return $this->belongsToMany(User::class, 'favorites', 'rental_id', 'user_id');
     }
 
-    public function unlocks() {
+    public function unlocks()
+    {
         return $this->hasMany(Unlock::class);
     }
 
@@ -76,18 +84,22 @@ class Rental extends Model
      *
      * @return array
      */
-    public function toSearchableArray()
+    // public function toSearchableArray()
+    // {
+    //     return [
+    //         'title' => $this->title,
+    //         'category' => $this->category,
+    //         'village' => $this->village,
+    //         'parish' => $this->parish,
+    //         'subcounty' => $this->subcounty,
+    //         'county' => $this->county,
+    //         'district' => $this->district,
+    //         'country' => $this->country,
+    //     ];
+    // }
+
+    public function searchableAs()
     {
-       return [
-        'title' => $this->title,
-        'category' => $this->category,
-        'village' => $this->village,
-        'parish' => $this->village,
-        'subcounty' => $this->village,
-        // 'county' => $this->village,
-        'district' => $this->village,
-        'country' => $this->village,
-       ];
+        return 'rentals';
     }
 }
-

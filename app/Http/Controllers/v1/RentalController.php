@@ -9,25 +9,45 @@ use App\Http\Resources\v1\RentalResource;
 use App\Models\Rental;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
-
-
 class RentalController extends BaseController
 {
-
     public function index()
     {
+        $rentals = Rental::all();
+
         // $rentals = Rental::search(request('search'))->get();
 
-        $rentals = Rental::query()->when(request('search'), function ($query) {
-            $query->where('title', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('category', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('village', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('county', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('district', 'LIKE', '%' . request('search') . '%')
-                ->orWhere('country', 'LIKE', '%' . request('search') . '%');
-        })->with('user')->orderby('promoted', 'desc')->get();
+        if ($query = request('search')) {
+            $rentals = Rental::search($query, function ($meilisearch, $query, $options) {
+                if($category = request('category')){
+                    $options['filter'] = 'category=' . $category;
+                }
+                if($minPrice = request('minPrice')){
+                    $options['filter'] = 'price>=' . $minPrice;
+                }
+                if($maxPrice = request('maxPrice')){
+                    $options['filter'] = 'price<=' . $maxPrice;
+                }
+                if($minPrice = request('minPrice') && $maxPrice = request('maxPrice')){
+                    $options['filter'] = "price>=4000000 AND price<=9000000";
+                }
+                if ($sortPrice = request('sortPrice')) {
+                    $options['sort'] = ["price:" . $sortPrice];
+                }
+                return $meilisearch->search($query, $options);
+            })->get();
+        }
+
+        // $rentals = Rental::query()->when(request('search'), function ($query) {
+        //     $query->where('title', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('category', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('village', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('county', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('district', 'LIKE', '%' . request('search') . '%')
+        //         ->orWhere('country', 'LIKE', '%' . request('search') . '%');
+        // })->with('user')->orderby('promoted', 'desc')->get();
 
         $resource = RentalResource::collection($rentals);
 
