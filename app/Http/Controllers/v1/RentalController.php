@@ -38,16 +38,16 @@ class RentalController extends BaseController
             })->get();
         }
 
-        // $rentals = Rental::query()->when(request('search'), function ($query) {
-        //     $query->where('title', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('category', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('village', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('county', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('district', 'LIKE', '%' . request('search') . '%')
-        //         ->orWhere('country', 'LIKE', '%' . request('search') . '%');
-        // })->with('user')->orderby('promoted', 'desc')->get();
+        $rentals = Rental::query()->when(request('search'), function ($query) {
+            $query->where('title', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('category', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('village', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('parish', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('subcounty', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('county', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('district', 'LIKE', '%' . request('search') . '%')
+                ->orWhere('country', 'LIKE', '%' . request('search') . '%');
+        })->with('user')->orderby('promoted', 'desc')->get();
 
         $resource = RentalResource::collection($rentals);
 
